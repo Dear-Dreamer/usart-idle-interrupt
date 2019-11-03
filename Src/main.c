@@ -47,14 +47,9 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-    if(__HAL_UART_GET_IT_SOURCE(&UartHandle, UART_IT_IDLE))
-    {
-      __HAL_UART_DISABLE_IT(&UartHandle, UART_IT_IDLE);
-      cpl_flag = usartcplt;
-      __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
-    }
-    else
-      cpl_flag = usartcplt;
+    __HAL_UART_DISABLE_IT(&UartHandle, UART_IT_IDLE);
+    cpl_flag = usartcplt;
+    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
     if(cpl_flag == 1)
     {
       cpl_flag = 0;
