@@ -1,22 +1,22 @@
-#ifndef UART_DATA_H
-#define UART_DATA_H
+#ifndef __USART_DATA_H
+#define __USART_DATA_H
 
-#include "stm32f1xx_hal_msp.h"
+#include "stm32f1xx_hal.h"
 
-#define DATA_RECEIVE_LEN_MAX 1024
-#define DATA_SIZE 2
-#define USED_BY_USR 1
-#define USED_BY_DMA 0
-
+#define MAX_DATA_LEN    2048
+#define USED_BY_DMA 1
+#define USED_BY_USER 0
 typedef struct{
-  uint8_t receive_data[DATA_RECEIVE_LEN_MAX];
-  uint32_t valid_len;
+  uint8_t receive_data[MAX_DATA_LEN];
   uint8_t used;
+  uint16_t valid_len;
 }usart_data;
 
+void init_usartdata(void);
+void set_databuffer_owner(usart_data *buffer, uint8_t owner);
 usart_data *get_valid_databuffer(void);
-void data_input(uint8_t *buffer, uint32_t len);
-void init_databuffer(void);
-void set_databuffer_owner(usart_data *data, uint8_t owner);
+void usartdata_start_receive(void);
+void usartdata_stop_receive(void);
+void usartdata_process(void);
 
 #endif

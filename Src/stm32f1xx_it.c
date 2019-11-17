@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    UART/UART_Printf/Src/stm32f1xx_it.c
+  * @file    UART/UART_HyperTerminal_DMA/Src/stm32f1xx_it.c
   * @author  MCD Application Team
   * @brief   Main Interrupt Service Routines.
   *          This file provides template for all exceptions handler and
@@ -21,14 +21,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal_msp.h"
-#include "stm32f1xx_it.h"
 #include "uart_data.h"
-
+#include "stm32f1xx_it.h"
 /** @addtogroup STM32F1xx_HAL_Examples
   * @{
   */
 
-/** @addtogroup UART_Printf
+/** @addtogroup UART_HyperTerminal_Interrupt
   * @{
   */
 
@@ -36,6 +35,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+/* UART handler declared in "main.c" file */
+extern UART_HandleTypeDef UartHandle;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -138,7 +139,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-    HAL_IncTick();
+  HAL_IncTick();
 }
 
 /******************************************************************************/
@@ -148,6 +149,48 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f1xx.s).                                               */
 /******************************************************************************/
 /**
+  * @brief  This function handles DMA RX interrupt request.
+  * @param  None
+  * @retval None
+  * @Note   This function is redefined in "main.h" and related to DMA stream
+  *         used for USART data transmission
+  */
+void USARTx_DMA_RX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(UartHandle.hdmarx);
+}
+
+/**
+  * @brief  This function handles DMA TX interrupt request.
+  * @param  None
+  * @retval None
+  * @Note   This function is redefined in "main.h" and related to DMA stream
+  *         used for USART data reception
+  */
+void USARTx_DMA_TX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(UartHandle.hdmatx);
+}
+
+/**
+  * @brief  This function handles USARTx interrupt request.  
+  * @param  None
+  * @retval None
+  * @Note   This function is redefined in "main.h" and related to DMA  
+  *         used for USART data transmission     
+  */
+void USARTx_IRQHandler(void)
+{
+  if(__HAL_UART_GET_FLAG(&UartHandle, UART_FLAG_IDLE))
+  {
+    __HAL_UART_CLEAR_IDLEFLAG(&UartHandle);
+    extern uint8_t usart_received_flag;
+    usart_received_flag = 1;
+    //usartdata_process();
+  }
+}
+
+/**
   * @brief  This function handles PPP interrupt request.
   * @param  None
   * @retval None
@@ -156,18 +199,6 @@ void SysTick_Handler(void)
 {
 }*/
 
-void USART1_IRQHandler(void)
-{
-  HAL_UART_IRQHandler(&UartHandle);
-  if (RESET != __HAL_UART_GET_FLAG(&UartHandle,UART_FLAG_IDLE))
-  {
-    extern uint8_t usartcplt;
-    __HAL_UART_CLEAR_IDLEFLAG(&UartHandle);
-    usartcplt = 1;
-    extern usart_data *current_databuffer;
-    set_databuffer_owner(current_databuffer, USED_BY_USR);
-  }
-}
 /**
   * @}
   */
