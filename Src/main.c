@@ -98,9 +98,7 @@ int main(void)
   printf("\r\ninit ok");
   while (1)
   {
-    __HAL_UART_DISABLE_IT(&UartHandle, UART_IT_IDLE);
      received = usart_received_flag;
-    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
     if(received == 1)
     {
       received = 0;

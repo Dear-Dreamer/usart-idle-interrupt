@@ -27,9 +27,7 @@ usart_data *get_valid_databuffer(void)
   uint32_t i = 0;
   for(i = 0; i < NUMBER_DATA; i++)
   {
-    __HAL_UART_DISABLE_IT(&UartHandle, UART_IT_IDLE);
     used = data[i].used;
-    __HAL_UART_ENABLE_IT(&UartHandle, UART_IT_IDLE);
     if(used == USED_BY_USER)
     {
       udata = &data[i];
